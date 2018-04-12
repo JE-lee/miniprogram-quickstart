@@ -1,0 +1,19 @@
+{
+  "name": "miniprogram-quickstart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-qyy-mp": "https://github.com/IBOS-team/eslint-config-qyy-mp.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "eslint-f": "eslint . --fix",
+    "precommit": "npm run eslint-f",
+    "prepush": "npm run eslint-f"
+  },
+  "author": "",
+  "license": "ISC"
+}

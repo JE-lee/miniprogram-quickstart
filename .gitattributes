@@ -1,0 +1,6 @@
+# FYI: https://eslint.org/docs/rules/linebreak-style#using-this-rule-with-version-control-systems
+*.js text eol=lf
+*.json text eol=lf
+*.wxml text eol=lf
+*.wxss text eol=lf
+*.png binary
