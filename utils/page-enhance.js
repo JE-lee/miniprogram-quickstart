@@ -15,6 +15,7 @@ let routeLock = false
 
 function _Page(config) {
   // type: back,tab,redirect
+  // url = "back4" 可以返回到页面栈前面四个
   config.$route = function(url, type = 'go') {
     if (routeLock) {
       return Promise.reject('fail:running')
@@ -40,7 +41,7 @@ function _Page(config) {
       routers[type](conf)
     })
   }
-
+  // 一次性存放临时数据
   config.$put = function(key, val) {
     channel[key] = val
   }
