@@ -21,37 +21,39 @@ const routers = {
 }
 let routeLock = false
 
+function route(url, type = 'go', ...argu) {
+  if (routeLock) {
+    return Promise.reject('fail:running')
+  }
+  routeLock = true
+  return new Promise((resolve, reject) => {
+    let conf = {
+      success: resolve,
+      fail: reject,
+      complete: () => routeLock = false
+    }
+    if (/^back/.test(url)) {
+      let [delta = 1] = url.match(/\d/) || []
+
+      type = 'back'
+      conf.delta = delta
+    } else {
+      if (!routers[type]) {
+        type = 'redirect'
+      }
+      conf.url = url
+    }
+    // 存储传递给跳转页面的数据
+    let key = Date.now() // 使用时间作为uuid 
+    storeData(key, argu)
+    routers[type](conf)
+  })
+}
+
 function _Page(config) {
   // type: back,tab,redirect
   // url = "back4" 可以返回到页面栈前面四个
-  config.$route = function(url, type = 'go',...argu) {
-    if (routeLock) {
-      return Promise.reject('fail:running')
-    }
-    routeLock = true
-    return new Promise((resolve, reject) => {
-      let conf = {
-        success: resolve,
-        fail: reject,
-        complete: () => routeLock = false
-      }
-      if (/^back/.test(url)) {
-        let [delta = 1] = url.match(/\d/) || []
-
-        type = 'back'
-        conf.delta = delta
-      } else {
-        if (!routers[type]) {
-          type = 'redirect'
-        }
-        conf.url = url
-      }
-      // 存储传递给跳转页面的数据
-      let key = Date.now() // 使用时间作为uuid 
-      storeData(key,argu)
-      routers[type](conf)
-    })
-  }
+  config.$route = route
   /**
    * 方便类似,不想覆盖form对象，针对多个属性的赋值
    * this.setData({
@@ -90,6 +92,7 @@ function _Page(config) {
   config.$removeAllListeners = function() {
     if (!this.$$events) return
     this.$$events.forEach(arr => emitter.removeListener(...arr))
+    this.$$events = null
   }
   config.$removeListener= function(...argu){
     if(!this.$$events) return 
@@ -194,3 +197,57 @@ Page = function(config) {
 }
 
 Page.originPage = originPage
+
+
+// component enhance
+
+// 重新定义微信内置的Component
+let originComponent = Component
+
+function _Component(config) {
+  config.methods = config.methods || {}
+  // Extends Event Emitter
+  /**
+   * 给当前页面绑定事件，通过此方法绑定的事件会在页面 unload 时自动解绑
+   * @param {...[type]} argu [description]
+   */
+  config.methods.$addListener = function (...argu) {
+    this.$$events = this.$$events || []
+    this.$$events.push([...argu])
+    return emitter.addListener(...argu)
+  }
+
+  config.methods.$removeListener = function (...arr) {
+    if (!this.$$events) return
+    emitter.removeListener(...arr)
+  }
+
+  config.methods.$removeAllListeners = function () {
+    if (!this.$$events) return
+    this.$$events.forEach(arr => emitter.removeListener(...arr))
+    this.$$events = null
+  }
+
+  // 在组件内也能使用$route
+  config.methods.$route = route
+
+  /**
+   * 给当前页面添加$emit，页面可以直接通过this.$emit来发布事件
+   */
+  config.methods.$emit = emitter.emit
+  let { detached } = config
+
+  config.detached = function () {
+    this.$removeAllListeners()
+    detached && detached.apply(this, arguments)
+  }
+
+  return originComponent(config)
+}
+
+
+Component = function (config) {
+  return _Component(config)
+}
+
+Component.originComponent = originComponent
