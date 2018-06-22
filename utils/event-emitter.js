@@ -1,34 +1,21 @@
 
-var event = (function() {
-  var events = {},
-    offlineStack = {},	// 离线事件，
+let event = (function() {
+  let events = {},
     ret = {
       listen(name, handler) {
         if (!name) return
         events[name] = events[name] || []
         events[name].push(handler)
-
-        let stack = offlineStack[name]
-        if (stack) {
-          stack.forEach(fn => fn())
-          stack = null
-        }
       },
       emit(name, ...data) {
-        var handlers = events[name]
-
-        if (!handlers || !handlers.length) {
-          offlineStack[name] = offlineStack[name] || []
-          offlineStack[name].push(() => this.emit(name, ...data))
-          return
-        }
-
+        let handlers = events[name]
         handlers.forEach((handler) => {
           if (typeof handler === 'function') {
             handler(...data)
           }
         })
       },
+      /*不传入handle ,则为删除name 的所有已经绑定的事件 */
       remove(name, handler) {
         let handlers = events[name]
         if (!handlers || !handlers.length) return
@@ -42,7 +29,6 @@ var event = (function() {
         }
       }
     }
-
   return ret
 })()
 
