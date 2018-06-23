@@ -1,4 +1,4 @@
 // app.js
-require('/utils/page-enhance')
+require('/utils/enhance')
 App({
 })

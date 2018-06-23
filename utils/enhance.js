@@ -205,6 +205,14 @@ Page.originPage = originPage
 let originComponent = Component
 
 function _Component(config) {
+  //当前的组件实例挂载到页面栈最顶层的页面实例下面
+  let pro = {
+    ref: {
+      type: String,
+      value: ''
+    }
+  }
+  config.properties = Object.assign(config.properties, pro)
   config.methods = config.methods || {}
   // Extends Event Emitter
   /**
@@ -235,9 +243,45 @@ function _Component(config) {
    * 给当前页面添加$emit，页面可以直接通过this.$emit来发布事件
    */
   config.methods.$emit = emitter.emit
-  let { detached } = config
+  let { detached, ready } = config
+
+  config.ready = function(){
+    let pages = getCurrentPages(),
+      topPage = pages[pages.length - 1],
+      ref = this.properties.ref
+    if(ref){
+      topPage.$refs = topPage.$refs || {}
+      let comp = topPage.$refs[ref]
+      if(comp instanceof Array){
+        comp.push(this)
+        this.$$refIndex = comp.length - 1
+      }else if (!comp){
+        comp = this
+      }else {
+        comp = [comp]
+        comp.push(this)
+        this.$$refIndex = comp.length - 1
+      }
+      topPage.$refs[ref] = comp
+    }
+    ready && ready.apply(this.arguments)
+  }
 
   config.detached = function () {
+    //动态卸载组件的时候，去除page对其的ref引用
+    let ref = this.properties.ref
+    if(ref){
+      let pages = getCurrentPages(),
+        topPage = pages[pages.length -1],
+        comp = topPage.$refs[ref]
+      if(this.$$refIndex === undefined){
+        comp = null
+      }else{
+        comp.splice(this.$$refIndex,1)
+      }
+      topPage.$refs[ref] = comp
+
+    }
     this.$removeAllListeners()
     detached && detached.apply(this, arguments)
   }
