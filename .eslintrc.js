@@ -6,7 +6,8 @@ module.exports = {
     },
     "extends": "qyy-mp",
     "parserOptions": {
-        "sourceType": "module"
+        "sourceType": "module",
+        "ecmaVersion": 8
     },
     "rules": {
         "linebreak-style": [

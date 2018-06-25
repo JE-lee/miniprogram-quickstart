@@ -27,7 +27,7 @@ function build(config, route = CONFIG.HOST) {
   } else {
     const api = {}
     Object.keys(config).forEach((k) => {
-      api[k] = build(config[k], `${route}/${k}`)
+      api[k] = build(config[k], `${ route }/${ k }`)
     })
     return api
   }
@@ -43,11 +43,11 @@ function build(config, route = CONFIG.HOST) {
 function buildMethod(config, route) {
   const [method = 'GET'] = config
 
-  const download = async (query = {}) => {
+  const download = async(query = {}) => {
     const params = Object.entries(query)
-      .map(([k, v]) => `${k}=${v}`).join('&')
+      .map(([k, v]) => `${ k }=${ v }`).join('&')
     const res = await wxp.downloadFile({
-      url: `${route}?${params}`
+      url: `${ route }?${ params }`
     })
     if (res.statusCode === 200) {
       return res.tempFilePath
@@ -57,7 +57,7 @@ function buildMethod(config, route) {
     }
   }
 
-  const apiRequest = async ({
+  const apiRequest = async({
     data = {},
     query = {},
     complete = noop,
@@ -67,28 +67,28 @@ function buildMethod(config, route) {
     clean(query)
 
     const params = Object.entries(query)
-      .map(([k, v]) => `${k}=${v}`).join('&')
+      .map(([k, v]) => `${ k }=${ v }`).join('&')
 
     if (desc) {
       const _complete = complete
       // NOTE: 注意complete的代码会在await的代码之后才执行
-      complete = function () {
+      complete = function() {
         wx.hideLoading()
         return _complete.apply(this, arguments)
       }
       wx.showLoading({
-        title: `${desc}中`,
+        title: `${ desc }中`,
         mask: true
       })
     }
 
     let res = await wxp.request({
-      url: `${route}?${params}`,
+      url: `${ route }?${ params }`,
       method,
       data,
       complete
     })
-    if(res.statusCode !== 200){
+    if (res.statusCode !== 200) {
       return Promise.reject()
     }
 
