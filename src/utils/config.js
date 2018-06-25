@@ -1,7 +1,7 @@
 const HOST = 'https://mp.weixin.qq.com'
 
 const APICONFIG = {
-  common:{
+  common: {
     list: [],
     detail: ['POST']
   }

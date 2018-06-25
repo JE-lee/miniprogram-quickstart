@@ -6,13 +6,32 @@
   "dependencies": {},
   "devDependencies": {
     "eslint": "^4.19.1",
-    "eslint-config-qyy-mp": "https://github.com/IBOS-team/eslint-config-qyy-mp.git"
+    "eslint-config-qyy-mp": "https://github.com/IBOS-team/eslint-config-qyy-mp.git",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "chai": "^4.1.2",
+    "colors": "^1.2.1",
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-babel": "^7.0.0",
+    "gulp-cson2": "^1.0.4",
+    "gulp-imagemin": "^4.1.0",
+    "gulp-plumber": "^1.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.6.1",
+    "gulp-sourcemaps": "^2.6.3",
+    "gulp-stylus": "^2.7.0",
+    "gulp-watch": "^5.0.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^6.1.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "eslint-f": "eslint . --fix",
     "precommit": "npm run eslint-f",
-    "prepush": "npm run eslint-f"
+    "prepush": "npm run eslint-f",
+    "start": "gulp"
   },
   "author": "",
   "license": "ISC"

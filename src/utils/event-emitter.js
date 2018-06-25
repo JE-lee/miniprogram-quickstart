@@ -15,7 +15,8 @@ let event = (function() {
           }
         })
       },
-      /*不传入handle ,则为删除name 的所有已经绑定的事件 */
+
+      /* 不传入handle ,则为删除name 的所有已经绑定的事件 */
       remove(name, handler) {
         let handlers = events[name]
         if (!handlers || !handlers.length) return

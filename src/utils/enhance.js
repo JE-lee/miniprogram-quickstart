@@ -44,7 +44,7 @@ function route(url, type = 'go', ...argu) {
       conf.url = url
     }
     // 存储传递给跳转页面的数据
-    let key = Date.now() // 使用时间作为uuid 
+    let key = Date.now() // 使用时间作为uuid
     storeData(key, argu)
     routers[type](conf)
   })
@@ -54,6 +54,7 @@ function _Page(config) {
   // type: back,tab,redirect
   // url = "back4" 可以返回到页面栈前面四个
   config.$route = route
+
   /**
    * 方便类似,不想覆盖form对象，针对多个属性的赋值
    * this.setData({
@@ -73,7 +74,7 @@ function _Page(config) {
         }
       }
       return this.setData(props)
-    } else if (typeof data === 'object' && !!object) {
+    } else if (typeof data === 'object' && !!data) {
       return this.setData(prefix)
     }
   }
@@ -94,8 +95,8 @@ function _Page(config) {
     this.$$events.forEach(arr => emitter.removeListener(...arr))
     this.$$events = null
   }
-  config.$removeListener= function(...argu){
-    if(!this.$$events) return 
+  config.$removeListener = function(...argu) {
+    if (!this.$$events) return
     emitter.removeListener(...argu)
   }
 
@@ -108,7 +109,7 @@ function _Page(config) {
   let mixin = config.mixin
   if (mixin instanceof Array) {
     _addMixin(config, mixin)
-  }else{
+  } else {
     _addMixin(config, [mixin])
   }
 
@@ -124,7 +125,7 @@ function _Page(config) {
   config.onLoad = function(query, ...argu) {
     this.__query = query
     // 接受跳转前页面传递的数据
-    let { key, data} = getData()
+    let { key, data } = getData()
     this.__pageKey = key
     this.__pageData = data
     onLoad && onLoad.call(this, query, ...argu)
@@ -132,6 +133,7 @@ function _Page(config) {
 
   return originPage(config)
 }
+
 /*
   将mixin 里面的方法和config里面方法合并。
   如果是一般的方法，config里面的覆盖mixin里面的方法，
@@ -154,10 +156,10 @@ function _addMixin(config, mixin) {
         } else {
           // 需要混合
           let mixinlife = item[key]
-          config[key] = function () {
-            //先执行mixin的lifecycle function
+          config[key] = function() {
+            // 先执行mixin的lifecycle function
             let obj1 = mixinlife.apply(this, arguments)
-            //再执行config的lifecycle function
+            // 再执行config的lifecycle function
             let obj2 = life.apply(this, arguments)
             if (key === 'onShareAppMessage') {
               return Object.assign({}, obj1, obj2)
@@ -169,9 +171,9 @@ function _addMixin(config, mixin) {
   })
 }
 
-let cacheKey = 0 //刚刚跳转页面对应的app.$$cacheData的key
+let cacheKey = 0 // 刚刚跳转页面对应的app.$$cacheData的key
 
-function storeData(key, data){
+function storeData(key, data) {
   let app = getApp()
   app.$$cachaData = app.$$cachaData || {}
   app.$$cachaData[key] = data
@@ -179,14 +181,14 @@ function storeData(key, data){
 }
 
 // 返回刚刚跳转页面的数据
-function getData(){
+function getData() {
   let app = getApp(),
     cacheData = app.$$cachaData || {}
   return { key: cacheKey, data: cacheData[cacheKey] }
 }
 
-function clearData(key){
-  if(key === undefined || key === null || key === NaN) return 
+function clearData(key) {
+  if (key === undefined || key === null || key === Number.isNaN(key)) return
   let app = getApp(),
     cacheData = app.$$cachaData || {}
   delete cacheData[key]
@@ -205,7 +207,7 @@ Page.originPage = originPage
 let originComponent = Component
 
 function _Component(config) {
-  //当前的组件实例挂载到页面栈最顶层的页面实例下面
+  // 当前的组件实例挂载到页面栈最顶层的页面实例下面
   let pro = {
     ref: {
       type: String,
@@ -219,18 +221,18 @@ function _Component(config) {
    * 给当前页面绑定事件，通过此方法绑定的事件会在页面 unload 时自动解绑
    * @param {...[type]} argu [description]
    */
-  config.methods.$addListener = function (...argu) {
+  config.methods.$addListener = function(...argu) {
     this.$$events = this.$$events || []
     this.$$events.push([...argu])
     return emitter.addListener(...argu)
   }
 
-  config.methods.$removeListener = function (...arr) {
+  config.methods.$removeListener = function(...arr) {
     if (!this.$$events) return
     emitter.removeListener(...arr)
   }
 
-  config.methods.$removeAllListeners = function () {
+  config.methods.$removeAllListeners = function() {
     if (!this.$$events) return
     this.$$events.forEach(arr => emitter.removeListener(...arr))
     this.$$events = null
@@ -245,19 +247,20 @@ function _Component(config) {
   config.methods.$emit = emitter.emit
   let { detached, ready } = config
 
-  config.ready = function(){
+  config.ready = function() {
     let pages = getCurrentPages(),
       topPage = pages[pages.length - 1],
       ref = this.properties.ref
-    if(ref){
+    if (ref) {
       topPage.$refs = topPage.$refs || {}
       let comp = topPage.$refs[ref]
-      if(comp instanceof Array){
+      if (comp instanceof Array) {
         comp.push(this)
         this.$$refIndex = comp.length - 1
-      }else if (!comp){
+      } else if (!comp) {
+        /* eslint-disable consistent-this*/
         comp = this
-      }else {
+      } else {
         comp = [comp]
         comp.push(this)
         this.$$refIndex = comp.length - 1
@@ -267,17 +270,17 @@ function _Component(config) {
     ready && ready.apply(this.arguments)
   }
 
-  config.detached = function () {
-    //动态卸载组件的时候，去除page对其的ref引用
+  config.detached = function() {
+    // 动态卸载组件的时候，去除page对其的ref引用
     let ref = this.properties.ref
-    if(ref){
+    if (ref) {
       let pages = getCurrentPages(),
-        topPage = pages[pages.length -1],
+        topPage = pages[pages.length - 1],
         comp = topPage.$refs[ref]
-      if(this.$$refIndex === undefined){
+      if (this.$$refIndex === undefined) {
         comp = null
-      }else{
-        comp.splice(this.$$refIndex,1)
+      } else {
+        comp.splice(this.$$refIndex, 1)
       }
       topPage.$refs[ref] = comp
 
@@ -290,7 +293,7 @@ function _Component(config) {
 }
 
 
-Component = function (config) {
+Component = function(config) {
   return _Component(config)
 }
 

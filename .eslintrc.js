@@ -21,5 +21,11 @@ module.exports = {
             "error",
             "never"
         ]
-    }
+    },
+    "globals": {
+        wxp: true,
+        noop: true,
+        global: true,
+        require: true
+    },
 };

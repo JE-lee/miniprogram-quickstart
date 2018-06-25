@@ -1,0 +1,5 @@
+wxParse/*
+src/public/*
+src/lib/*
+src/**/*.wxs
+dist/
