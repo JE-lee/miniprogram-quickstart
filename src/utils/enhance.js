@@ -261,13 +261,14 @@ function _Component(config) {
         /* eslint-disable consistent-this*/
         comp = this
       } else {
+        // wx:for循环创建组件时的ref数组
         comp = [comp]
         comp.push(this)
         this.$$refIndex = comp.length - 1
       }
       topPage.$refs[ref] = comp
     }
-    ready && ready.apply(this.arguments)
+    ready && ready.apply(this, arguments)
   }
 
   config.detached = function() {
